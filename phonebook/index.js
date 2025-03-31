@@ -6,12 +6,10 @@ app.use(express.static('dist'))
 const cors = require('cors')
 
 app.use(cors())
-morgan.token('object', (req,res) => {
-
+morgan.token('object', (req, res) => {
     return JSON.stringify(req.body)
 })
-//app.use(morgan('tiny'))
-app.use(morgan(':method :url :status :res[content-length] - :response-time ms :object'))
+app.use(morgan('tiny'))
 let persons = [
     {
         "id": 1,
@@ -35,7 +33,7 @@ let persons = [
     }
 ]
 
-const checkIfnameExist = (name) =>  persons.find(p => p.name === name) !== undefined 
+const checkIfnameExist = (name) => persons.find(p => p.name === name) !== undefined
 
 app.get('/api/persons', (request, response) => response.json(persons))
 
@@ -61,7 +59,8 @@ app.get('/info', (request, response) => {
     )
 })
 
-app.post('/api/persons', (request, response) => {
+app.post('/api/persons', morgan(':method :url :status :res[content-length] - :response-time ms :object'), (request, response) => {
+
 
     const person = { ...request.body, id: Math.floor(Math.random() * 10000) }
     if (!person.name) {
@@ -78,8 +77,8 @@ app.post('/api/persons', (request, response) => {
     }
     persons = persons.concat(person)
     response.json(person)
-}
-)
+})
+
 app.delete('/api/persons/:id', (request, response) => {
     const id = Number(request.params.id)
     persons = persons.filter(p => p.id !== id)
